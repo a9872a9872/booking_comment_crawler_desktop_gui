@@ -2,16 +2,17 @@ import csv
 import os
 import tkinter.ttk as ttk
 from tkinter import *
+from threading import Thread
 
 from BookingCrawler import BookingCrawler
 
 languageList = {'所有語言': 'all', '中文': 'zh'}
 
 
-def crawler_comment():
-    if countryString.get() != "" and hotelNameString.get() != "" and languageString.get() != "":
+def crawler_comment(country, hotel, language):
+    if country != "" and hotel != "" and language != "":
         bc = BookingCrawler()
-        hotel = bc.crawler_comment(countryString.get(), hotelNameString.get(), languageList[languageString.get()])
+        hotel = bc.crawler_comment(country, hotel, languageList[language])
 
         directory = "data/"
         if not os.path.exists(directory):
@@ -32,6 +33,11 @@ def crawler_comment():
     resultString.set(result_string)
 
 
+def thread(args):
+    t = Thread(target=crawler_comment, args=args)
+    t.start()
+
+
 app = Tk()
 app.geometry('300x150')
 
@@ -48,17 +54,24 @@ languageString = StringVar()
 
 entryCountry = Entry(app, width=25, textvariable=countryString)
 entryHotelName = Entry(app, width=25, textvariable=hotelNameString)
-Comboboxlanguage = ttk.Combobox(app, width=22, state='readonly', values=list(languageList), textvariable=languageString)
+comboboxLanguage = ttk.Combobox(app, width=22, state='readonly', values=list(languageList.keys()),
+                                textvariable=languageString)
 
 entryCountry.grid(column=1, row=0, padx=10)
 entryHotelName.grid(column=1, row=1, padx=10)
-Comboboxlanguage.grid(column=1, row=2, padx=10)
+comboboxLanguage.grid(column=1, row=2, padx=10)
 
 entryCountry.insert(0, "tw")
 entryHotelName.insert(0, "hong-fu-you-ya-shang-lu")
-Comboboxlanguage.set('中文')
+comboboxLanguage.set('中文')
 
-crawlerButton = Button(app, text="開始爬取", command=crawler_comment)
+crawlerButton = Button(app, text="開始爬取", command=lambda: thread(
+    (
+        countryString.get(),
+        hotelNameString.get(),
+        languageString.get())
+    )
+)
 crawlerButton.grid(column=0, row=3, pady=10, sticky=W)
 
 resultString = StringVar()
