@@ -14,9 +14,9 @@ class BookingCrawler:
                           'Chrome/92.0.4515.107 Safari/537.36'}
         return
 
-    def crawler_comment(self, country, hotel_name):
+    def crawler_comment(self, country, hotel_name, language):
         hotel_url = f"https://www.booking.com//reviews/{country}/hotel/{hotel_name}.zh-tw.html" + \
-                    "?r_lang=all;customer_type=total;order=completed_asc;rows=25"
+                    f"?r_lang={language};customer_type=total;order=completed_asc;rows=25"
         hotel = {}
 
         try:
